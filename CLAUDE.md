@@ -15,16 +15,24 @@ swift build
 # Build the Xcode framework
 xcodebuild build -scheme Moscapsule -sdk iphonesimulator
 
-# Run all tests (Xcode only — no SPM test target yet)
+# Run all tests via SPM
+swift test
+
+# Run all tests via Xcode
 xcodebuild test -scheme Moscapsule -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # Run a single test
 xcodebuild test -scheme Moscapsule \
   -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:MoscapsuleTests/MoscapsuleTests/testPublishAndSubscribe
+
+# List SPM tests
+swift test list
 ```
 
-**Test caveat:** All tests are integration tests against `test.mosquitto.org`. They require network access and are acknowledged as "fragile" in the test comments. There is no `Tests/` directory yet, so `swift test` reports no tests found; the suite currently only runs via `xcodebuild`.
+**Test caveat:** All tests are integration tests against `test.mosquitto.org`. When the broker is unreachable, all 10 tests skip gracefully via `XCTSkipUnless` — no failures. `test.mosquitto.org:1883` is blocked on many corporate/home networks; skips are normal. Both `swift test` and `xcodebuild test` behave identically.
+
+**SPM warning (benign):** `swift test` emits "unhandled file" warnings for `Info.plist` in `MoscapsuleTests/` and `Moscapsule/`. Safe to ignore — they don't affect the build or test run.
 
 ## Architecture
 
@@ -47,7 +55,7 @@ The core pattern is a **Swift → Objective-C → C** call chain:
 
 ### Initialization Requirement
 
-`moscapsule_init()` **must be called once** before any SSL/TLS operations. `moscapsule_cleanup()` on teardown. The test suite calls this in `setUp()` with a guard flag.
+`moscapsule_init()` **must be called once** before any SSL/TLS operations. `moscapsule_cleanup()` on teardown. The test suite calls this in `setUpWithError()` with a guard flag (skipped when broker is unreachable).
 
 ### Callback Pattern
 
