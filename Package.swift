@@ -36,5 +36,14 @@ let package = Package(
             path: "Moscapsule",
             sources: ["Moscapsule.swift"]
         ),
+        .testTarget(
+            name: "MoscapsuleTests",
+            dependencies: ["Moscapsule"],
+            path: "MoscapsuleTests",
+            sources: ["MoscapsuleTests.swift"],
+            resources: [
+                .copy("cert.bundle"),
+            ]
+        ),
     ]
 )
