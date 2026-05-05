@@ -9,10 +9,13 @@ Moscapsule is a **Swift wrapper around the Mosquitto C MQTT client library** (v1
 ## Build & Test
 
 ```bash
-# Build the framework
+# Build via SPM
+swift build
+
+# Build the Xcode framework
 xcodebuild build -scheme Moscapsule -sdk iphonesimulator
 
-# Run all tests
+# Run all tests (Xcode only — no SPM test target yet)
 xcodebuild test -scheme Moscapsule -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # Run a single test
@@ -21,7 +24,7 @@ xcodebuild test -scheme Moscapsule \
   -only-testing:MoscapsuleTests/MoscapsuleTests/testPublishAndSubscribe
 ```
 
-**Test caveat:** All tests are integration tests against `test.mosquitto.org`. They require network access and are acknowledged as "fragile" in the test comments.
+**Test caveat:** All tests are integration tests against `test.mosquitto.org`. They require network access and are acknowledged as "fragile" in the test comments. There is no `Tests/` directory yet, so `swift test` reports no tests found; the suite currently only runs via `xcodebuild`.
 
 ## Architecture
 
@@ -59,9 +62,9 @@ The ObjC bridge captures the Swift closure via `__bridge` and invokes it from th
 
 ## Dependencies
 
-- **OpenSSL-Universal** `~> 3.3` (CocoaPods) — provides TLS support
 - **OpenSSL-Package** `≥ 3.3.2000` (SPM) — provides TLS support
-- **OpenSSL** git submodule (`submodules/OpenSSL/`) — for manual Xcode integration
+- **OpenSSL-Universal** `~> 3.3` (CocoaPods) — provides TLS support
+- **OpenSSL-Package** git submodule (`submodules/OpenSSL/`) — for manual Xcode integration
 - **Mosquitto** — embedded C source in `mosquitto/lib/` (not a Pod dependency)
 
 ## CocoaPods
